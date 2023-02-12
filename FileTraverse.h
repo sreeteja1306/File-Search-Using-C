@@ -7,3 +7,4 @@
 #include <stdbool.h>
 
 void printhelp();
+void FilesTraverse(char *Path, bool f_flag,bool s_flag,bool S_flag,char *f_argSubString, int depth, int fileSize);
