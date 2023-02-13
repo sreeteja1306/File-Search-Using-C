@@ -7,7 +7,7 @@ int main (int argc, char **argv)
     char *SubString,*RootDrectory= "..";
     char argParse;
     struct stat dir_state;
-
+    int curr_depth=0;
     for ( int index = 1; index < argc; index++)
     {
         if (stat(argv[index], &dir_state) == 0){
@@ -47,5 +47,5 @@ int main (int argc, char **argv)
                 printhelp();
         }
     }
-    FilesTraverse(RootDrectory, f_flag, s_flag, S_flag, SubString, depth, fileSize);
+    FilesTraverse(RootDrectory, f_flag, s_flag, S_flag, SubString, depth, fileSize,curr_depth);
 }

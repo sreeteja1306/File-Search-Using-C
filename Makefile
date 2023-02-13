@@ -7,7 +7,7 @@ SEARCH = FileTraverse.o
 EXECS = Hw2
 
 build : Hw2
-	./Hw2 -f tt 6 -s 1024 -S
+	./Hw2
 
 %.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $^
