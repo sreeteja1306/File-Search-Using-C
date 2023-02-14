@@ -5,7 +5,7 @@ CFLAGS = -Wall -g
 OBJS = Hw2.o
 SEARCH = FileTraverse.o
 EXECS = search
-TARGETFOLDER = project1
+TARGETFOLDER = project
 
 build : search
 	./$^ -S $(TARGETFOLDER)
