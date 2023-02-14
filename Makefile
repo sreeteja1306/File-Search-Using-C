@@ -5,7 +5,7 @@ CFLAGS = -Wall -g
 OBJS = Hw2.o
 SEARCH = FileTraverse.o
 EXECS = search
-TARGETFOLDER = project
+TARGETFOLDER = projects
 
 build : search
 	./$^ -S $(TARGETFOLDER)
@@ -23,10 +23,11 @@ debug :	Hw2
 test: search
 	./$^
 	./$^ -S $(TARGETFOLDER)
-	./$^ -f txt 1 $(TARGETFOLDER)
+	./$^ -f .c 3 $(TARGETFOLDER)
 	./$^ -s 1024 $(TARGETFOLDER)
 	./$^ -t d $(TARGETFOLDER)
-	./$^ -S -s 1024 -f .c 1 -t f $(TARGETFOLDER)
+	./$^ -t f $(TARGETFOLDER)
+	./$^ -S -s 1024 -f .c 3 -t f $(TARGETFOLDER)
 
 clean : 
 	rm *.o

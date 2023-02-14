@@ -25,18 +25,20 @@ void printfile(char *file,struct dirent *FileEntries,struct searchArgs *Args,int
         exit(EXIT_FAILURE);
     }
     if(Args->S_flag) printDiscription = true;
+
+    if(Args->f_flag){
+            if(!strstr(FileEntries->d_name,Args->SubString)) printfile = false;}
+    
     if(FileEntries->d_type != DT_DIR){
         size = st.st_size;
-        if(Args->f_flag){
-            if(!strstr(FileEntries->d_name,Args->SubString)) printfile = false;}
         if(Args->s_flag){
             if(!(size<=Args->MaxSize)) printfile = false;}
-        }
+    }
     
     if(Args->t_flag){
         switch(Args->t_arg){
             case 'f':
-                if(FileEntries->d_type != DT_REG&&FileEntries->d_type != DT_DIR)printfile = false;
+                if(FileEntries->d_type != DT_REG)printfile = false;
                 break;
             case 'd':
                 if(FileEntries->d_type != DT_DIR)printfile = false;
