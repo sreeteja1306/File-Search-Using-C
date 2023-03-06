@@ -8,7 +8,7 @@ EXECS = search
 TARGETFOLDER = projects
 
 build : search
-	./$^ -S $(TARGETFOLDER)
+	./$^ -s 1024 -e "ls -l" $(TARGETFOLDER)
 
 %.o : %.c
 	$(CC) $(CFLAGS) -c -o $@ $^
@@ -28,6 +28,9 @@ test: search
 	./$^ -t d $(TARGETFOLDER)
 	./$^ -t f $(TARGETFOLDER)
 	./$^ -S -s 1024 -f .c 3 -t f $(TARGETFOLDER)
+	./$^ -s 1024 -e "ls -l" $(TARGETFOLDER)
+	./$^ -f docx 3 -E "tar cvf docx.tar" $(TARGETFOLDER)
+	./$^ -s 1024 -f jpg 3 -e "wc -l" $(TARGETFOLDER)
 
 clean : 
 	rm *.o

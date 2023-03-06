@@ -1,11 +1,49 @@
 #include "FileTraverse.h"
 
+void ecmdParser(char *opt,char *path,char **cmd){
+    int count = 0;
+    char *commandLine = strdup(opt);
+    commandLine = strtok(commandLine," ");
+    while (commandLine != NULL){
+        cmd[count++]=commandLine;
+        commandLine = strtok(NULL, " ");}
+    cmd[count++]=path;
+    cmd[count++]=NULL;
+}
+
+char **EcmdParser(char *opt,bool get){
+    static int count = 0;
+    static char *cmd[1000];
+    if(get){
+        cmd[count++]=NULL;
+        return cmd;
+    }
+    char *commandLine = strdup(opt);
+    commandLine = strtok(commandLine," ");
+    while (commandLine != NULL){
+        cmd[count++]=commandLine;
+        commandLine = strtok(NULL, " ");}
+    return cmd;
+}
+
+void executeCmd(char **cmd){
+    int forkid = fork();//printf("%s\n",fileLoc);
+    if (forkid == 0){
+        int status = execvp(cmd[0],cmd);
+        if (status == -1)
+        printf("error");
+    }
+    else if (forkid > 0) wait(NULL);
+}
+
 void printhelp(){
     printf("Hw2 [options] [target]\n");
     printf("Options:\n");
     printf("-f <string pattern> <depth>\tlist all files that satisfy string pattern and depth\n");
     printf("-s <string size>           \tlist all files with file size less than or equal to the value\n");
     printf("-S                         \tlist all files along with size, permissions, and last access time\n");
+    printf("-e <UNIX CMD>              \tExecute the cmd on every file that match search criteria\n");
+    printf("-E <UNIX CMD>              \tExecute the cmd on all the files that match search criteria\n");
 }
 
 
@@ -15,7 +53,7 @@ const char* printFormat(bool show,int curr_depth){
     else return "%s\n";
 }
 
-void printfile(char *file,struct dirent *FileEntries,struct searchArgs *Args,int curr_depth){
+bool printfile(char *file,struct dirent *FileEntries,struct searchArgs *Args,int curr_depth,bool Show){
     bool printfile = true,printDiscription=false;
     struct stat st;
     int size=0;
@@ -24,6 +62,7 @@ void printfile(char *file,struct dirent *FileEntries,struct searchArgs *Args,int
         perror("stat");
         exit(EXIT_FAILURE);
     }
+
     if(Args->S_flag) printDiscription = true;
 
     if(Args->f_flag){
@@ -45,10 +84,13 @@ void printfile(char *file,struct dirent *FileEntries,struct searchArgs *Args,int
                 break;
         }
     }
-    if(printfile){
+
+
+    if(printfile && Show){
         printf(printFormat(printDiscription,curr_depth),FileEntries->d_name,size,(uintmax_t) st.st_mode,strtok(ctime(&st.st_atime),"\n"));
     }
-    else if(printfile) printf(printFormat(printDiscription,curr_depth),FileEntries->d_name);
+
+    return printfile;
 }
 
 void FilesTraverse(char *Path,struct searchArgs *Args,int curr_depth){
@@ -66,7 +108,18 @@ void FilesTraverse(char *Path,struct searchArgs *Args,int curr_depth){
                 strcat(fileLoc,"/");
                 strcat(fileLoc,FileEntries->d_name);
                 
-                printfile(fileLoc,FileEntries,Args,curr_depth);
+                
+                bool temp = printfile(fileLoc,FileEntries,Args,curr_depth,(Args->S_flag || !(Args->e_flag || Args->E_flag)));
+                if(FileEntries->d_type != DT_DIR && temp){
+                    if(Args->e_flag){
+                        char *cmd[100];
+                        ecmdParser(Args->e_cmd,fileLoc,cmd);
+                        executeCmd(cmd);
+                    }
+                    if(Args->E_flag){
+                        EcmdParser(fileLoc,false);
+                    }
+                }
                 
                 if(FileEntries->d_type == DT_DIR && Args->depth > curr_depth){
                     FilesTraverse(fileLoc,Args,curr_depth+1);
