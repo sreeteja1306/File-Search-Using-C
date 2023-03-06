@@ -19,7 +19,7 @@ int main (int argc, char **argv)
     }
 
 
-    while((argParse = getopt(argc, argv, "s:Sf:t:h")) != -1){
+    while((argParse = getopt(argc, argv, "s:Sf:e:E:t:h")) != -1){
         switch(argParse){
             case 'f':
                 ParsedArgs->f_flag = true;
@@ -47,6 +47,15 @@ int main (int argc, char **argv)
             case 'S':
                 ParsedArgs->S_flag = true;
                 break;
+            case 'e':
+                ParsedArgs->e_flag = true;
+                ParsedArgs->e_cmd=optarg;
+                break;
+            case 'E':
+                ParsedArgs->E_flag = true;
+                ParsedArgs->E_cmd=optarg;
+                EcmdParser(ParsedArgs->E_cmd,false);
+                break;
             case 'h':
                 printhelp();
                 break;
@@ -57,5 +66,10 @@ int main (int argc, char **argv)
         }
     }
     FilesTraverse(RootDrectory,ParsedArgs,0);
+    if(ParsedArgs->E_flag){
+        char **cmd;
+        cmd = EcmdParser("",true);
+        executeCmd(cmd);
+    }
     free(ParsedArgs);
 }
